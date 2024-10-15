@@ -50,7 +50,7 @@ class FomcMeetingScript(FomcBase):
         if from_year > 2014:
             print("Meeting scripts are available for 2014 or older")
         if from_year <= 2014:
-            for year in range(from_year, 2015):
+            for year in range(from_year, 2019):
                 yearly_contents = []
                 fomc_yearly_url = self.base_url + '/monetarypolicy/fomchistorical' + str(year) + '.htm'
                 r_year = requests.get(fomc_yearly_url)

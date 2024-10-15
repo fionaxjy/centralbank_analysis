@@ -47,7 +47,9 @@ class FomcTestimony(FomcBase):
 
         url = self.base_url + '/json/ne-testimony.json'
         res = requests.get(url)
-        res_list = json.loads(res.text)
+        #res_list = json.loads(res.text)
+        res_list = json.loads(res.content.decode('utf-8-sig')) ## modified
+
         for record in res_list:
             doc_link = record.get('l')
             if doc_link:

@@ -73,7 +73,7 @@ if __name__ == '__main__':
         from_year = 1936
         print("From year is set as 1936. Please specify the year as the first argument if required.")
 
-    # Retrieve FOMC Meeting date from current page - from 2015 to 2020
+    # Retrieve FOMC Meeting date from current page - from 2015 to 2024
     r = requests.get(calendar_url)
     soup = BeautifulSoup(r.text, 'html.parser')
     panel_divs = soup.find_all('div', {"class": "panel panel-default"})
@@ -118,23 +118,24 @@ if __name__ == '__main__':
 
             date_list.append({"date": meeting_date, "unscheduled": is_unscheduled, "forecast": is_forecast, "confcall": False})
 
-    # Retrieve FOMC Meeting date older than 2015
-    for year in range(from_year, 2015):
+    # Retrieve FOMC Meeting date older than 2019
+    for year in range(from_year, 2019):
         hist_url = base_url + '/monetarypolicy/fomchistorical' + str(year) + '.htm'
         r = requests.get(hist_url)
         soup = BeautifulSoup(r.text, 'html.parser')
-        if year in (2011, 2012, 2013, 2014):
+        if year in (2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018):
             panel_headings = soup.find_all('h5', {"class": "panel-heading"})
         else:
             panel_headings = soup.find_all('div', {"class": "panel-heading"})
         print("YEAR: {} - {} meetings found.".format(year, len(panel_headings)))
         for panel_heading in panel_headings:
             date_text = panel_heading.get_text().strip()
-            #print("Date: ", date_text)
-            regex = r"(January|February|March|April|May|June|July|August|September|October|November|December).*\s(\d*-)*(\d+)\s+(Meeting|Conference Calls?|\(unscheduled\))\s-\s(\d+)"
+            print("Date: ", date_text)
+            # regex = r"(January|February|March|April|May|June|July|August|September|October|November|December).*\s(\d*-)*(\d+)\s+(Meeting|Conference Calls?|\(unscheduled\))\s-\s(\d+)"
+            regex = r"(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?).*\s(\d*-)*(\d+)\s+(Meeting|Conference Calls?|\(unscheduled\))\s-\s(\d+)"
             date_text_ext = re.findall(regex, date_text)[0]
             meeting_date_str = date_text_ext[4] + "-" + date_text_ext[0] + "-" + date_text_ext[2]
-            #print("   Extracted:", meeting_date_str)
+            print("   Extracted:", meeting_date_str)
             if meeting_date_str == '1992-June-1':
                 meeting_date_str = '1992-July-1'
             elif meeting_date_str == '1995-January-1':
@@ -145,6 +146,12 @@ if __name__ == '__main__':
                 meeting_date_str = '2012-August-1'
             elif meeting_date_str == '2013-April-1':
                 meeting_date_str = '2013-May-1'
+            elif meeting_date_str == '2017-Jan-1':
+                meeting_date_str = '2017-February-1'
+            elif meeting_date_str == '2017-Oct-1':
+                meeting_date_str = '2017-November-1'
+            elif meeting_date_str == '2018-Jul-1':
+                meeting_date_str = '2018-August-1'
 
             meeting_date = datetime.strptime(meeting_date_str, '%Y-%B-%d')
             is_confcall = "Conference Call" in date_text_ext[3]
